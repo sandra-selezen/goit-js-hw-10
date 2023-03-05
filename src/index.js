@@ -17,8 +17,6 @@ function onHandleInput(event) {
   event.preventDefault();
   const name = event.target.value.trim();
   // console.log(name);
-  refs.infoEl.innerHTML = "";
-  refs.listEl.innerHTML = "";
   if (!name) {
     return;
   }
@@ -27,41 +25,46 @@ function onHandleInput(event) {
       if (countries.length > 10) {
         return Notify.info('Too many matches found. Please enter a more specific name.');
       }
-      
       createCountryItemEl(countries);
     })
-    .catch(error => Notify.failure('Oops, there is no country with that name'));
+    .catch(onError);
 }
 
 function createCountryItemEl(countries) {
   if (countries.length === 1) {
     createCountryInfo(countries);
   } else {
-    refs.listEl.innerHTML = countries
-    .map(({ flafs, name }) => {
+    refs.infoEl.innerHTML = "";
+    const markup = countries
+    .map(({ flags, name }) => {
       return `<li class="country-item">
-        <img class="country-flag" src="${flafs.svg} alt="${flafs.alt}">
-        <p class="county-name">${name.offitial}</p>
+        <p class="county-name"><img class="country-flag" alt="${flags.alt}" src="${flags.svg}" width="80" height="40"> ${name.official}</p>
         </li>`;
     })
-    .join("");
+      .join("");
+    refs.listEl.innerHTML = markup;
   }
 }
 
 function createCountryInfo(countries) {
-  refs.infoEl.innerHTML = countries
-    .map(({ flafs, name, capital, population, languages }) => {
-      return `<img class="country-flag" src="${flafs.svg} alt="${flafs.alt}">
-        <p class="county-name">${name.offitial}</p>
+  refs.listEl.innerHTML = "";
+  const markup = countries
+    .map(({ flags, name, capital, population, languages }) => {
+      return `<h1 class="county-name"><img class="country-flag" alt="${flags.alt}" src="${flags.svg}" width="100" height="40"> ${name.official}</h1>
         <ul>
         <li>Capital: ${capital}</li>
         <li>Population: ${population}</li>
-        <li>Languages: ${languages}</li>
+        <li>Languages: ${Object.values(languages)}</li>
         </ul>`
     })
     .join("");
+  refs.infoEl.innerHTML = markup;
 }
 
-
+function onError() {
+  refs.listEl.innerHTML = "";
+  refs.infoEl.innerHTML = "";
+  Notify.failure('Oops, there is no country with that name');
+}
 // Notify.failure('Oops, there is no country with that name');
 // Notify.info('Too many matches found. Please enter a more specific name.');
